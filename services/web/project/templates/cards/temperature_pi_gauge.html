@@ -1,0 +1,13 @@
+{% extends "cards/__main_card.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block cardinner %}
+    <div class="card-header">
+        Abertura de Porta Porto
+    </div>
+    <div class="card-body">
+       <div class="gauge">
+           <canvas width="70" height="70" id="canvas-preview"></canvas>
+           <div id="preview-textfield" style="font-size: 15px;">0%</div>
+       </div>
+    </div>
+{% endblock %}

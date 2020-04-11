@@ -1,0 +1,17 @@
+
+<tr>
+     <td class="title">{{ door.get_hour() }}</td>
+    {% if door is not none %}
+        {% if door.get_door_status() == 1 %}
+                <td class="title">Fechada</td>
+        {% elif door.get_door_status() == 2 %}
+                <td class="title">Abrir</td>
+        {% elif door.get_door_status() == 0 %}
+                 <td class="title">Aberta</td>
+        {% elif door.get_door_status() == 3 %}
+                 <td class="title">Fechar</td>
+        {% endif %}
+    {% else %}
+        NONE
+    {%endif %}
+</tr>

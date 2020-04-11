@@ -1,0 +1,24 @@
+{% extends "cards/__main_card.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block cardinner %}
+    <div class="card-header">
+        Palacoulo
+    </div>
+    <div class="card-body">
+    <p> Porta está <span style="color:
+                {% if status.door_status == 1 or status is none %}
+                 red; ">   Fechada</span></p>
+                    <a href= {{ url_for('app.change_garage_door') }} class="btn btn-primary" >Abrir</a>
+                {% elif status.door_status == 2 %}
+                 yellow; ">   A Abrir</span></p>
+                    <a href= {{ url_for('app.change_garage_door') }} class="btn btn-primary" >Fechar</a>
+                    <p> distance : {{ distance }}</p>
+                {% elif status.door_status == 0 %}
+                 green; ">   Aberta</span></p>
+                    <a href= {{ url_for('app.change_garage_door') }} class="btn btn-primary" >Fechar</a>
+                {% elif status.door_status == 3 %}
+                yellow; ">    A fechar</span></p>
+                    <a href= {{ url_for('app.change_garage_door') }} class="btn btn-primary" >Abrir</a>
+                {% endif %}
+    </div>
+{% endblock %}

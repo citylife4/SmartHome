@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.8.1-slim-buster
+FROM python:3.8-alpine
 
 # set work directory
 WORKDIR /usr/src/app
@@ -9,7 +9,10 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install system dependencies
-RUN apt-get update && apt-get install -y netcat
+RUN apk update && \
+    apk add --virtual build-deps gcc python-dev musl-dev && \
+    apk add postgresql-dev && \
+   apk add --no-cache libffi-dev openssl-dev
 
 # install dependencies
 RUN pip install --upgrade pip

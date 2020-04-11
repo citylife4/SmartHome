@@ -1,0 +1,18 @@
+{% extends "main.html" %}
+{% block pageinner %}
+
+
+    <div id="loading"></div>
+    {% include 'cards/palacoulo_garage_door_opener.html' %}
+    {% include 'cards/porto_door_opener.html' %}
+    {% include 'cards/boken_graph.html' %}
+    {% include 'cards/temperature_pi_gauge.html' %}
+
+    <script type="text/javascript">// <![CDATA[
+    $('a').click(function () {
+        $("#loading").show();
+        $("#row").hide();
+    });
+    // ]]></script>
+
+{% endblock %}

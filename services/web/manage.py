@@ -1,7 +1,9 @@
 from flask.cli import FlaskGroup
 
-from project import app, db, User
+from project import create_homedash_app, db
+from project.models import User
 
+app = create_homedash_app()
 
 cli = FlaskGroup(app)
 
@@ -15,7 +17,12 @@ def create_db():
 
 @cli.command("seed_db")
 def seed_db():
-    db.session.add(User(email="michael@mherman.org"))
+    name = 'admin'
+    password = 'admin'
+    email = 'admin@admin.com'
+    u = User(username=name, email=email, admin=1)
+    u.set_password(password)
+    db.session.add(u)
     db.session.commit()
 
 
