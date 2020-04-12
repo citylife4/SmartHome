@@ -1,0 +1,10 @@
+{% extends "cards/__main_card.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block cardinner %}
+    <div class="card-header">
+        Abertura de Porta Porto
+    </div>
+    <div class="card-body">
+        <a href={{ url_for('app.open_porto_door') }} class="btn btn-primary" >Abrir</a>
+    </div>
+{% endblock %}

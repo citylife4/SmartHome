@@ -1,0 +1,41 @@
+{% extends "main.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block pageinner %}
+
+    <div class="col-sm-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Mudar Password</h5>
+                <table class="table table-striped table-bordered table-hover">
+                    {{ wtf.quick_form(reset_form,action=url_for('auth.change_pass')) }}
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Criar novo Utilizador</h5>
+                <table class="table table-striped table-bordered table-hover">
+                    {{ wtf.quick_form(reg_form,action=url_for('auth.new_user')) }}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" class="col-sm-6 mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Tabela de Utilizadores</h5>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    {% for user in users %}
+                        {% include 'cards/_users.html' %}
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
