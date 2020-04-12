@@ -1,0 +1,5 @@
+version: 1
+update_configs:
+  - package_manager: "python"
+    directory: "/services/web/project"
+    update_schedule: "daily"
