@@ -50,13 +50,14 @@ def create_homedash_app(config_class=config.Config):
     # from app.errors import blueprint as errors_blueprint
     # app.register_blueprint(errors_blueprint)
 
+    from .api import bp as api_bp
+    homedash.register_blueprint(api_bp, url_prefix=homedash.config['NGINX_URL']+'/api')
+
     from .auth import blueprint as auth_blueprint
     homedash.register_blueprint(auth_blueprint, url_prefix=homedash.config['NGINX_URL'])
-    #homedash.register_blueprint(auth_blueprint)
 
     from .main import blueprint as main_blueprint
     homedash.register_blueprint(main_blueprint, url_prefix=homedash.config['NGINX_URL'])
-    #homedash.register_blueprint(main_blueprint)
 
     # from app.api import blueprint as api_blueprint
     # app.register_blueprint(api_blueprint, url_prefix='/api')

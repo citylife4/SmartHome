@@ -3,5 +3,6 @@
     <td class="title">{{ user.id }}</td>
     <td class="title">{{ user.username }}</td>
     <td class="title">{{ user.email }}</td>
+    <td class="title">{{ user.token }}</td>
     <td> <a href="{{ url_for('auth.delete_user', token=user.id) }}"> delete </a> </td>
 </tr>

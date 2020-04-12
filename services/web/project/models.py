@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import ceil
+import os, base64, json
 
 from project import login, db, bcrypt
 
@@ -7,22 +8,60 @@ from project import login, db, bcrypt
 class User(db.Model):
     __tablename__ = "users"
 
-    id = db.Column('id', db.Integer, primary_key=True)
-    username = db.Column('username', db.String(20), unique=True, index=True)
-    password = db.Column('password', db.String(172))
-    email = db.Column('email', db.String(50), unique=True, index=True)
-    registered_on = db.Column('registered_on', db.DateTime)
-    last_login_date = db.Column('last_login_date', db.DateTime)
-    logged_in_bol = db.Column('logged_in_bol', db.Boolean)
-    admin = db.Column('admin', db.Boolean)
+    id              = db.Column('id',               db.Integer, primary_key=True)
+    username        = db.Column('username',         db.String(20), unique=True, index=True)
+    password        = db.Column('password',         db.String(172))
+    email           = db.Column('email',            db.String(50), unique=True, index=True)
+    registered_on   = db.Column('registered_on',    db.DateTime)
+    last_login_date = db.Column('last_login_date',  db.DateTime)
+    logged_in_bol   = db.Column('logged_in_bol',    db.Boolean)
+    admin           = db.Column('admin',            db.Boolean)
+    token           = db.Column(db.String(32), index=True, unique=True)
+    token_expiration= db.Column(db.DateTime)
 
     def __init__(self, username, email, admin):
         self.username = username
         self.email = email
-        self.registered_on = datetime.now()
-        self.last_login_date = datetime.now()
+        self.registered_on = datetime.utcnow()
+        self.last_login_date = datetime.utcnow()
         self.logged_in_bol = False
         self.admin = admin
+
+    def get_token(self, expires_in=3600):
+        now = datetime.utcnow()
+        if self.token and self.token_expiration > now + timedelta(seconds=60):
+            return self.token
+        self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
+        self.token_expiration = now + timedelta(seconds=expires_in)
+        db.session.add(self)
+        return self.token
+
+    def revoke_token(self):
+        self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
+
+    @staticmethod
+    def check_token(token):
+        user = User.query.filter_by(token=token).first()
+        if user is None or user.token_expiration < datetime.utcnow():
+            return None
+        return user
+
+    def to_dict(self, include_email=False):
+        data = {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'last_login_date': self.last_login_date,
+            'admin': self.admin
+        }
+        return data
+
+    def from_dict(self, data, new_user=False):
+        for field in ['username', 'email', 'admin']:
+            if field in data:
+                setattr(self, field, data[field])
+        if new_user and 'password' in data:
+            self.set_password(data['password'])
 
     @property
     def is_authenticated(self):
@@ -46,7 +85,7 @@ class User(db.Model):
     def change_login_in_status(self, bool):
         self.logged_in_bol = bool
         if not self.logged_in_bol:
-            self.last_login_date = datetime.now()
+            self.last_login_date = datetime.utcnow()
         db.session.commit()
         return self.logged_in_bol
 
@@ -70,6 +109,11 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+class HomeLocationServer(db.Model):
+    __tablename__ = "home_location_server"
+    id       = db.Column('id', db.Integer, primary_key=True)
+    location = db.Column('username',db.String(20), unique=True, index=True)
+
 
 class PalacouloDoorStatus(db.Model):
     __tablename__ = "palacoulo_garage_door"
@@ -77,6 +121,18 @@ class PalacouloDoorStatus(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
     date = db.Column('date', db.DateTime, index=True)
     door_status = db.Column('door_status', db.INT)
+
+    def to_dict(self, include_email=False):
+        data = {
+            'id': self.id,
+            'date': self.date,
+            'door_status': self.door_status,
+        }
+        return data
+
+    def __init__(self, door_state):
+        self.door_status = door_state
+        self.date = datetime.utcnow()
 
     def get_door_status(self):
         return self.door_status
@@ -111,7 +167,19 @@ class Data(object):
 class PortoDoorStatus(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
     date = db.Column('date', db.DateTime, index=True)
-    opened = db.Column('door_status', db.INT)
+    opened = db.Column('door_status', db.String(20))
+
+    def to_dict(self, include_email=False):
+        data = {
+            'id': self.id,
+            'date': self.date,
+            'opened': self.opened,
+        }
+        return data
+
+    def __init__(self, door_state):
+        self.opened = door_state
+        self.date = datetime.utcnow()
 
     def get_opened_status(self):
         return self.opened
