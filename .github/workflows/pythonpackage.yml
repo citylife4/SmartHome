@@ -13,6 +13,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./services/web
+       
     strategy:
       matrix:
         python-version: [3.5, 3.6, 3.7, 3.8]
@@ -39,5 +42,5 @@ jobs:
         pip install pytest
         pytest
       env:
-        FLASK_APP: "$GITHUB_WORKSPACE/services/web/project:app"
+        FLASK_APP: "project:app"
         FLASK_DEBUG: 1
