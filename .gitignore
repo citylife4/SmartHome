@@ -2,3 +2,4 @@
 *.pyo
 .vscode/*
 .vscode/settings.json
+logs/*microblog*.log
