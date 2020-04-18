@@ -113,6 +113,6 @@ class Relay(Thread):
 
         self.w2r.start()
         print ("[Relay({})] connection established".format(self.port))
-        self.w2r.rasps.update({"palacoulo": "dvpalacoulo.dynip.sapo.pt"})
-        self.w2r.rasps.update({"porto": "dvporto.dynip.sapo.pt"})
+        self.w2r.rasps.update({"palacoulo": "basd"})
+        self.w2r.rasps.update({"porto": "basd"})
         #self.r2r.start()
