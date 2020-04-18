@@ -1,0 +1,64 @@
+version: '3.7'
+
+services:
+  web:
+    build: ./services/web
+    command: python manage.py run -h 0.0.0.0
+    volumes:
+      - ./services/web/:/usr/src/app/
+    ports:
+      - 5000:5000
+    env_file:
+      - ./.env.common
+      - ./.env.dev
+    environment:
+      - APP=web
+    depends_on:
+      - db
+
+  relay:
+    build: ./services/web
+    command: python run_relay.py
+    volumes:
+      - ./services/web/:/usr/src/app/
+    env_file:
+      - ./.env.common
+      - ./.env.dev
+    depends_on:
+      - db
+      - web
+    
+  db:
+    image: postgres:12-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=hello_flask
+      - POSTGRES_PASSWORD=hello_flask
+      - POSTGRES_DB=hello_flask_dev
+    ports:
+      - "5432:5432"
+    #networks:
+      #  - db
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4:4.16
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+       - pgadmin:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    #networks:
+    #  - db
+    restart: unless-stopped
+ 
+#networks:
+#  db:
+#    driver: bridge
+ 
+volumes:
+    postgres_data:
+    pgadmin:

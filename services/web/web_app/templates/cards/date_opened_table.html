@@ -1,0 +1,31 @@
+<div class="card-header">{{ type +" em " + submit_date }}</div>
+
+{#
+                    <form method="post" action="{{ url_for('app.porto_overview',location=type) }}">
+                        {{ form.hidden_tag() }}
+                        {{ form.dt(class="date") }}
+                        <button type="submit">Go</button>
+                    </form>
+    #}
+<div class="card-body">
+    {{ wtf.quick_form(form) }}
+    <div class="table-responsive m-3">
+        <table class="table table-striped table-sm">
+            {% if door is not none or value == 1  %}
+                {% for door in door_table %}
+                    {% if submit_date in door.date.strftime('%x') %}
+                        {% include 'cards/_'+type+'_door_status.html' %}
+                    {% endif %}
+                {% endfor %}
+                {% if prev_url %}
+                    <a href="{{ prev_url }}"> Trás </a>
+                {% endif %}
+                {% if next_url %}
+                    <a href="{{ next_url }}"> Frente </a>
+                {% endif %}
+            {% else %}
+                <p>&mdash;Não há informações disponíveis para esta data&mdash;</p>
+            {% endif %}
+        </table>
+    </div>
+</div>

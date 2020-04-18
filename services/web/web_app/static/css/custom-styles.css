@@ -1,0 +1,13 @@
+body {
+  padding-top: 4rem;
+  padding-bottom: 3rem;
+  color: #5a5a5a;
+}
+
+
+div.dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
+/* Try to find a thing more specific */

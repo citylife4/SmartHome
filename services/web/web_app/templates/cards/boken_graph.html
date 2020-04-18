@@ -1,0 +1,14 @@
+{% extends "cards/__main_card.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block cardinner %}
+    <div class="card-header">
+        Graph
+    </div>
+    <div class="card-body">
+     {% for plot in plots %}
+        {% for part in plot %}
+            {{part | safe}}
+        {% endfor %}
+    {% endfor %}
+    </div>
+{% endblock %}
