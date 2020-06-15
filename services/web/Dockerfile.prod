@@ -52,7 +52,7 @@ WORKDIR $APP_HOME
 
 # install dependencies
 RUN apk update && \
-    apk add --virtual build-deps gcc python-dev musl-dev && \
+    apk add --virtual build-deps gcc musl-dev && \
     apk add postgresql-dev && \
    apk add --no-cache libffi-dev openssl-dev
 

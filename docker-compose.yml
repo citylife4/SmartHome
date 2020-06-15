@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile.prod
     command: gunicorn --log-level debug --bind 0.0.0.0:5000 manage:app
     volumes:
-      - static_volume:/home/app/web/project/static
-      - media_volume:/home/app/web/project/media
+      - static_volume:/home/app/web/web_app/static
+      - media_volume:/home/app/web/web_app/media
     expose:
       - 5000
     env_file:
@@ -22,14 +22,19 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./.env.prod.db
+
   nginx:
-    build: ./services/nginx
+    image: staticfloat/nginx-certbot
+    restart: always
     volumes:
-      - static_volume:/home/app/web/project/static
-      - media_volume:/home/app/web/project/media
-      - /data/certs:/etc/nginx/certs
-      - /etc/letsencrypt:/etc/letsencrypt
-      - /var/www/certbot:/var/www/certbot
+      - static_volume:/home/app/web/web_app/static
+      - media_volume:/home/app/web/web_app/media
+      - ./services/nginx:/etc/nginx/user.conf.d
+      - ./services/html:/etc/nginx/html
+      - ./var/nginx:/var/log/nginx
+      - ./var/goaccess:/var/goaccess
+    environment:
+      ENVSUBST_VARS: MAIN_SERVER NGINX_URL
     env_file:
       - ./.env.common
       - ./.env.prod
@@ -38,19 +43,22 @@ services:
       - 443:443
     depends_on:
       - web
-      - certbot
-    command: /bin/sh -c "envsubst '$${MAIN_SERVER},$${NGINX_URL}' < /etc/nginx/conf.d/mysite.template > /etc/nginx/conf.d/nginx.conf && cat /etc/nginx/conf.d/nginx.conf && nginx -g 'daemon off;'" 
-  certbot:
-    image: tobi312/rpi-certbot
-    restart: unless-stopped
+
+  goaccess:
+    image: allinurl/goaccess
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-      - /var/www/certbot:/var/www/certbot
-    env_file:
-      - ./.env.common
-      - ./.env.prod
-    command: "/bin/sh -c 'certbot certonly --nginx -d $${MAIN_SERVER} -d www.$${MAIN_SERVER} --email $${MAIN_EMAIL} --text --agree-tos --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --renew-by-default --standalone-supported-challenges http-01; echo \"done\" '"
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot --standalone renew; sleep 12h & wait $${!}; done;'"
+      - ./etc/goaccess:/srv/config
+      - ./var/goaccess:/srv/report
+      - ./var/nginx:/srv/logs
+    ports:
+      - "7890:7890"
+    cap_drop:
+      - all
+    command: ["--no-global-config", "--config-file=/srv/config/goaccess.conf", "--log-file=/srv/logs/access.log"]
+    depends_on:
+      - nginx
+      - web
+
 
 volumes:
   postgres_data:
