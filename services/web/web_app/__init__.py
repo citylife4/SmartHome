@@ -33,6 +33,25 @@ babel = Babel()
 def create_homedash_app(config_class=config.Config):
     homedash = Flask(__name__)
     homedash.config.from_object(config_class)
+    ##Change stating path for another
+    ## TODO: Change this if homedash dos not have nothing
+    a_new_static_path = '/'+homedash.config['NGINX_URL']+"/static/"
+
+    # Set the static_url_path property.
+    homedash.static_url_path = a_new_static_path
+
+    # Remove the old rule from Map._rules.
+    for rule in homedash.url_map.iter_rules('static'):
+        homedash.url_map._rules.remove(rule)  # There is probably only one.
+
+    # Remove the old rule from Map._rules_by_endpoint. In this case we can just 
+    # start fresh.
+    homedash.url_map._rules_by_endpoint['static'] = []  
+
+    # Add the updated rule.
+    homedash.add_url_rule(f'{a_new_static_path}/<path:filename>',
+                    endpoint='static',
+                    view_func=homedash.send_static_file)
 
     db.init_app(homedash)
     migrate.init_app(homedash, db)
@@ -51,13 +70,13 @@ def create_homedash_app(config_class=config.Config):
     # app.register_blueprint(errors_blueprint)
 
     from .api import bp as api_bp
-    homedash.register_blueprint(api_bp, url_prefix=homedash.config['NGINX_URL']+'/api')
+    homedash.register_blueprint(api_bp, url_prefix='/'+homedash.config['NGINX_URL']+'/api')
 
     from .auth import blueprint as auth_blueprint
-    homedash.register_blueprint(auth_blueprint, url_prefix=homedash.config['NGINX_URL'])
+    homedash.register_blueprint(auth_blueprint, url_prefix='/'+homedash.config['NGINX_URL'])
 
     from .main import blueprint as main_blueprint
-    homedash.register_blueprint(main_blueprint, url_prefix=homedash.config['NGINX_URL'])
+    homedash.register_blueprint(main_blueprint, url_prefix='/'+homedash.config['NGINX_URL'])
 
     # from app.api import blueprint as api_blueprint
     # app.register_blueprint(api_blueprint, url_prefix='/api')
