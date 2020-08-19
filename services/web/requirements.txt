@@ -29,4 +29,4 @@ Werkzeug==1.0.1
 WTForms==2.3.3
 pyserial==3.4
 email_validator==1.1.1
-
+pycrypto==2.6.1
