@@ -7,7 +7,6 @@ app = create_homedash_app()
 
 cli = FlaskGroup(app)
 
-
 @cli.command("create_db")
 def create_db():
     db.create_all()
