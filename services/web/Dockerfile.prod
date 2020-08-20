@@ -53,8 +53,8 @@ WORKDIR $APP_HOME
 # install dependencies
 RUN apk update && \
     apk add --virtual build-deps gcc musl-dev && \
-    apk add postgresql-dev && \
-   apk add --no-cache libffi-dev openssl-dev
+    apk add postgresql-dev python3-dev build-base && \
+   apk add --no-cache  g++ make libffi-dev openssl-dev
 
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
