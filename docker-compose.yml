@@ -16,6 +16,21 @@ services:
       - ./.env.prod
     depends_on:
       - db
+
+  relay:
+    build:
+      context: ./services/web
+      dockerfile: Dockerfile.prod
+    command: python run_relay.py
+    expose:
+      - 54897
+    env_file:
+      - ./.env.common
+      - ./.env.prod
+    depends_on:
+      - db
+      - web
+
   db:
     image: postgres:12-alpine
     volumes:
