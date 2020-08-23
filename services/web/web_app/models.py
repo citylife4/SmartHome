@@ -6,8 +6,6 @@ from web_app import login, db, bcrypt
 
 
 class User(db.Model):
-    __tablename__ = "users"
-
     id              = db.Column('id',               db.Integer, primary_key=True)
     username        = db.Column('username',         db.String(20), unique=True, index=True)
     password        = db.Column('password',         db.String(172))
@@ -16,6 +14,7 @@ class User(db.Model):
     last_login_date = db.Column('last_login_date',  db.DateTime)
     logged_in_bol   = db.Column('logged_in_bol',    db.Boolean)
     admin           = db.Column('admin',            db.Boolean)
+    smarthouses     = db.relationship('SmartHouse', backref='admin', lazy='dynamic')
     token           = db.Column(db.String(32), index=True, unique=True)
     token_expiration= db.Column(db.DateTime)
 
@@ -109,6 +108,51 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+## https://app.lucidchart.com/documents/edit/0363c9f6-2650-4bce-8c7c-0520836af61a/0_0
+class SmartHouse(db.Model):
+    id              = db.Column('id', db.Integer, primary_key=True)
+    admin_id        = db.Column(db.Integer, db.ForeignKey('user.id'))
+    location        = db.Column('location', db.String(50))
+    url             = db.Column('url', db.String(50))
+    port            = db.Column('port', db.Integer)
+    floors          = db.Column('floors', db.Integer)
+    registered_on   = db.Column('registered_on',    db.DateTime)
+    last_connetion  = db.Column('last_connetion',  db.DateTime)
+    controllers     = db.relationship('SmartController', backref='house', lazy='dynamic')
+
+
+class SmartController(db.Model):
+    id      = db.Column('id', db.Integer, primary_key=True)
+    house_id   = db.Column(db.Integer, db.ForeignKey('smart_house.id'))
+    ctype   = db.Column('type', db.String(50))
+    floor   = db.Column('floor', db.Integer)
+    registered_on   = db.Column('registered_on',    db.DateTime)
+    last_connetion = db.Column('last_login_date',  db.DateTime)
+    sensors = db.relationship('SmartSensor', backref='controller', lazy='dynamic')
+
+
+
+class SmartSensor(db.Model):
+    id            = db.Column('id', db.Integer, primary_key=True)
+    controller_id    = db.Column(db.Integer, db.ForeignKey('smart_controller.id'))
+    sensor        = db.Column('sensor',            db.Boolean)
+    gpio          = db.Column('gpio',            db.Integer)
+    description   = db.Column('description', db.String(50))
+    registered_on   = db.Column('registered_on',    db.DateTime)
+    last_connetion = db.Column('last_connetion',  db.DateTime)
+    actions       = db.relationship('SmartAction', backref='sensor', lazy='dynamic')
+
+class SmartAction(db.Model):
+    __tablename__ = "smart_house_action"
+    id       = db.Column('id', db.Integer, primary_key=True)
+    sensor_id    = db.Column(db.Integer, db.ForeignKey('smart_sensor.id'))
+    time     = db.Column('time',  db.DateTime)
+    action   = db.Column('action', db.String(50))
+    outcome   = db.Column('outcome', db.String(50))
+
+
+
+## Old Models:
 class HomeLocationServer(db.Model):
     __tablename__ = "home_location_server"
     id       = db.Column('id', db.Integer, primary_key=True)

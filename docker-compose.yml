@@ -17,13 +17,13 @@ services:
     depends_on:
       - db
 
-  relay:
+  proxy:
     build:
       context: ./services/web
       dockerfile: Dockerfile.prod
-    command: python run_relay.py
-    expose:
-      - 54897
+    command: python run_proxy.py
+      - 54897:54897
+      - 4000-4005:4000-4005
     env_file:
       - ./.env.common
       - ./.env.prod

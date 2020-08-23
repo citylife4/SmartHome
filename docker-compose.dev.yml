@@ -16,9 +16,12 @@ services:
     depends_on:
       - db
 
-  relay:
+  proxy:
     build: ./services/web
-    command: python run_relay.py
+    command: python run_proxy.py
+    ports:
+      - 54897:54897
+      - 4000-4005:4000-4005
     volumes:
       - ./services/web/:/usr/src/app/
     env_file:
@@ -43,7 +46,7 @@ services:
 
   pgadmin:
     container_name: pgadmin_container
-    image: dpage/pgadmin4:4.16
+    image: dpage/pgadmin4:4.25
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
