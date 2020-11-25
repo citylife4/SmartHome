@@ -3,7 +3,7 @@ psycopg2-binary==2.8.6
 alembic==1.4.3
 Babel==2.9.0
 bcrypt==3.2.0
-cffi==1.14.3
+cffi==1.14.4
 Click==7.1.2
 dominate==2.6.0
 Flask==1.1.2
